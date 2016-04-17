@@ -75,7 +75,7 @@ public:
 
     void draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatrix);
 
-    void setModelMatrix(glm::mat4 matrix);
+    void setModelMatrix(glm::mat4 matrix) { this->modelMatrix = matrix; }
     void setAxis(glm::vec3 axis);
 
     void setVertexBufferData(GLfloat vertexArray[]);
@@ -94,4 +94,8 @@ public:
     void setColorBack(GLfloat colorArray[]);
     void setColorLeft(GLfloat colorArray[]);
     void setColorRight(GLfloat colorArray[]);
+    
+    std::string getPosition() { return position; }
+    
+    
 };

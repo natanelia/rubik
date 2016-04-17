@@ -321,3 +321,4 @@ void Cube::setColorRight(GLfloat colorArray[]) {
         colorBufferData[i] = colorArray[i - RIGHT_VERTEX];
     }
 }
+

@@ -148,7 +148,7 @@ static GLfloat cd[] = {
 // Projection matrix : 45deg Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 glm::mat4 ProjectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 // Camera matrix
-glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(0,0,-12), glm::vec3(0,0,0), glm::vec3(0,-1,0));
+glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(8,-8,-12), glm::vec3(0,0,0), glm::vec3(0,-1,0));
 
 int main( void )
 {
@@ -189,7 +189,7 @@ int main( void )
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
     // Dark blue background
-    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+    glClearColor(0.5f, 0.55f, 1.0f, 0.0f);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
@@ -205,7 +205,43 @@ int main( void )
 
     // Get a handle for our "MVP" uniform
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-
+    int cubesCode[3][3][3];
+    cubesCode[0][0][0] = 111;
+    cubesCode[0][0][1] = 112;
+    cubesCode[0][0][2] = 113;
+    
+    cubesCode[0][1][0] = 121;
+    cubesCode[0][1][1] = 122;
+    cubesCode[0][1][2] = 123;
+    
+    cubesCode[0][2][0] = 131;
+    cubesCode[0][2][1] = 132;
+    cubesCode[0][2][2] = 133;
+    
+    cubesCode[1][0][0] = 211;
+    cubesCode[1][0][1] = 212;
+    cubesCode[1][0][2] = 213;
+    
+    cubesCode[1][1][0] = 221;
+    // cubesCode[1][1][1] = 222;
+    cubesCode[1][1][2] = 223;
+    
+    cubesCode[1][2][0] = 231;
+    cubesCode[1][2][1] = 232;
+    cubesCode[1][2][2] = 233;
+    
+    cubesCode[2][0][0] = 311;
+    cubesCode[2][0][1] = 312;
+    cubesCode[2][0][2] = 313;
+    
+    cubesCode[2][1][0] = 321;
+    cubesCode[2][1][1] = 322;
+    cubesCode[2][1][2] = 323;
+    
+    cubesCode[2][2][0] = 331;
+    cubesCode[2][2][1] = 332;
+    cubesCode[2][2][2] = 333;
+    
     Cube cubes[3][3][3];
     cubes[0][0][0] = Cube("111", vd, cd);
     cubes[0][0][1] = Cube("112", vd, cd);
@@ -379,8 +415,11 @@ int main( void )
             lastTime += 1.0;
         }
 
+        
         if (currentTime - startTime <= 1.0131f && doAnimate != NO_ROTATE) {
             glm::vec3 __rotation;
+         
+
             switch (doAnimate) {
                 case ROTATE_LEFT_TO_TOP:
                     __rotation = glm::vec3(-M_PI * deltaTime, 0.0f, 0.0f); // TO_TOP
@@ -388,7 +427,7 @@ int main( void )
                     for (int i = 0; i < 1; i++) {
                         for (int j = 0; j < 3; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -400,7 +439,7 @@ int main( void )
                     for (int i = 0; i < 1; i++) {
                         for (int j = 0; j < 3; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -412,7 +451,7 @@ int main( void )
                     for (int i = 1; i < 2; i++) {
                         for (int j = 0; j < 3; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -424,7 +463,7 @@ int main( void )
                     for (int i = 1; i < 2; i++) {
                         for (int j = 0; j < 3; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -448,7 +487,7 @@ int main( void )
                     for (int i = 2; i < 3; i++) {
                         for (int j = 0; j < 3; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -460,7 +499,7 @@ int main( void )
                     for (int i = 0; i < 3; i++) {
                         for (int j = 0; j < 1; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -472,7 +511,7 @@ int main( void )
                     for (int i = 0; i < 3; i++) {
                         for (int j = 0; j < 1; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -484,7 +523,7 @@ int main( void )
                     for (int i = 0; i < 3; i++) {
                         for (int j = 1; j < 2; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -520,7 +559,7 @@ int main( void )
                     for (int i = 0; i < 3; i++) {
                         for (int j = 2; j < 3; j++) {
                             for (int k = 0; k < 3; k++) {
-                               cubes[i][j][k].rotate(__rotation);
+                                cubes[i][j][k].rotate(__rotation);
                             }
                         }
                     }
@@ -528,6 +567,374 @@ int main( void )
                     break;
             }
         } else {
+            
+            int temp_cubesCode[3][3];
+            Cube temp_cube[3][3][3];
+            switch (doAnimate) {
+                case ROTATE_LEFT_TO_TOP:
+                    for(int i = 0; i < 1; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[i][2-k][j].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[i][2-k][j].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[i][2-k][j].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_BOTTOM);
+                            }
+                        }
+                    }
+                    for(int i = 0; i < 1; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_LEFT_TO_BOTTOM:
+                    for(int i = 0; i < 1; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[i][k][2-j].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[i][k][2-j].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[i][k][2-j].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_TOP);
+                            }
+                        }
+                    }
+                    for(int i = 0; i < 1; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_CENTER_TO_TOP:
+                    for(int i = 1; i < 2; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[i][2-k][j].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[i][2-k][j].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[i][2-k][j].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_BOTTOM);
+                            }
+                        }
+                    }
+                    for(int i = 1; i < 2; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_CENTER_TO_BOTTOM:
+                    for(int i = 1; i < 2; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[i][k][2-j].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[i][k][2-j].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[i][k][2-j].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_TOP);
+                            }
+                        }
+                    }
+                    for(int i = 1; i < 2; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_RIGHT_TO_TOP:
+                    for(int i = 2; i < 3; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[i][2-k][j].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[i][2-k][j].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[i][2-k][j].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_BOTTOM);
+                            }
+                        }
+                    }
+                    for(int i = 2; i < 3; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_RIGHT_TO_BOTTOM:
+                    for(int i = 2; i < 3; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[i][k][2-j].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[i][k][2-j].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[i][k][2-j].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_TOP);
+                            }
+                        }
+                    }
+                    for(int i = 2; i < 3; i++){
+                        for(int j = 0; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_TOP_TO_LEFT:
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 0; j < 1; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[2-k][j][i].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[2-k][j][i].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[2-k][j][i].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_LEFT);
+                            }
+                        }
+                    }
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 0; j < 1; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_TOP_TO_RIGHT:
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 0; j < 1; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[k][j][2-i].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[k][j][2-i].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[k][j][2-i].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_RIGHT);
+                            }
+                        }
+                    }
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 0; j < 1; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_MIDDLE_TO_LEFT:
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 1; j < 2; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[2-k][j][i].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[2-k][j][i].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[2-k][j][i].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_LEFT);
+                            }
+                        }
+                    }
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 1; j < 2; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_MIDDLE_TO_RIGHT:
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 1; j < 2; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[k][j][2-i].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[k][j][2-i].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[k][j][2-i].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_RIGHT);
+                            }
+                        }
+                    }
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 1; j < 2; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_BOTTOM_TO_LEFT:
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 2; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[2-k][j][i].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[2-k][j][i].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[2-k][j][i].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_LEFT);
+                            }
+                        }
+                    }
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 2; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                case ROTATE_BOTTOM_TO_RIGHT:
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 2; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
+                                temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
+                                temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
+                                temp_cube[i][j][k].setColorRight(cubes[k][j][2-i].getColorRight());
+                                temp_cube[i][j][k].setColorBottom(cubes[k][j][2-i].getColorBottom());
+                                temp_cube[i][j][k].setColorTop(cubes[k][j][2-i].getColorTop());
+                                temp_cube[i][j][k].rotateColor(ROTATE_RIGHT);
+                            }
+                        }
+                    }
+                    for(int i = 0; i < 3; i++){
+                        for(int j = 2; j < 3; j++){
+                            for(int k = 0; k < 3; k++){
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
+                                cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
+                                cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
+                                cubes[i][j][k].setColorRight(temp_cube[i][j][k].getColorRight());
+                                cubes[i][j][k].setColorBottom(temp_cube[i][j][k].getColorBottom());
+                                cubes[i][j][k].setColorTop(temp_cube[i][j][k].getColorTop());
+                            }
+                        }
+                    }
+                    break;
+                    
+                default:
+                    break;
+            }
+
             keyLock = false;
             doAnimate = NO_ROTATE;
         }
@@ -539,7 +946,7 @@ int main( void )
                 }
             }
         }
-
+        
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
