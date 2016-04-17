@@ -10,11 +10,13 @@
 // GLuint colorBuffer;
 // GLfloat colorBufferData[NUM_POINTS];
 
+Cube::Cube() {
+    
+}
+
 Cube::Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[]) {
     for (int i = 0; i < NUM_POINTS; i++) {
         if (vertexArray[i] == 1.0f) {
-            printf("GELOT\n");
-            fflush(stdout);
             vertexBufferData[i] = vertexArray[i] - 0.1f;
         } else {
             vertexBufferData[i] = vertexArray[i];
@@ -74,7 +76,6 @@ Cube::~Cube() {
     glDeleteBuffers(1, &colorBuffer);
 }
 
-
 void Cube::rotate(glm::vec3 axis, glm::vec3 angle) {
     glm::quat orientation = glm::quat(angle);
 
@@ -89,6 +90,53 @@ void Cube::rotate(glm::vec3 angle) {
     this->modelMatrix = glm::translate(this->modelMatrix, glm::vec3(-axis.x, -axis.y, -axis.z));
     this->modelMatrix *= glm::eulerAngleYXZ(orientation.y, orientation.x, orientation.z);
     this->modelMatrix = glm::translate(this->modelMatrix, axis);
+}
+
+void Cube::rotateColor(int ROTATE_TO) {
+    GLfloat * colorLeft = getColorLeft();
+    GLfloat * colorFront = getColorFront();
+    GLfloat * colorRight = getColorRight();
+    GLfloat * colorBack = getColorBack();
+    GLfloat * colorTop = getColorTop();
+    GLfloat * colorBottom = getColorBottom();
+
+    switch (ROTATE_TO) {
+        case ROTATE_RIGHT:
+            setColorFront(colorLeft);
+            setColorRight(colorFront);
+            setColorBack(colorRight);
+            setColorLeft(colorBack);
+
+            break;
+        case ROTATE_LEFT:
+            setColorLeft(colorFront);
+            setColorFront(colorRight);
+            setColorRight(colorBack);
+            setColorBack(colorLeft);
+
+            break;
+        case ROTATE_TOP:
+            setColorTop(colorFront);
+            setColorFront(colorBottom);
+            setColorBottom(colorBack);
+            setColorBack(colorTop);
+
+            break;
+        case ROTATE_BOTTOM:
+            setColorTop(colorBack);
+            setColorFront(colorTop);
+            setColorBottom(colorFront);
+            setColorBack(colorBottom);
+
+            break;
+    }
+
+    delete [] colorLeft;
+    delete [] colorFront;
+    delete [] colorRight;
+    delete [] colorBack;
+    delete [] colorTop;
+    delete [] colorBottom;
 }
 
 void Cube::translate(glm::vec3 translation) {
@@ -175,6 +223,68 @@ void Cube::setColorBufferData(GLfloat colorArray[]) {
         colorBufferData[i] = colorArray[i];
     }
 }
+
+
+GLfloat * Cube::getColorTop() {
+    GLfloat * colorData = new GLfloat[NUM_POINTS_IN_SIDE];
+
+    for (int i = TOP_VERTEX; i < TOP_VERTEX + NUM_POINTS_IN_SIDE; i++) {
+        colorData[i - TOP_VERTEX] = colorBufferData[i];
+    }
+
+    return colorData;
+}
+
+GLfloat * Cube::getColorBottom() {
+    GLfloat * colorData = new GLfloat[NUM_POINTS_IN_SIDE];
+
+    for (int i = BOTTOM_VERTEX; i < BOTTOM_VERTEX + NUM_POINTS_IN_SIDE; i++) {
+        colorData[i - BOTTOM_VERTEX] = colorBufferData[i];
+    }
+
+    return colorData;
+}
+
+GLfloat * Cube::getColorFront() {
+    GLfloat * colorData = new GLfloat[NUM_POINTS_IN_SIDE];
+
+    for (int i = FRONT_VERTEX; i < FRONT_VERTEX + NUM_POINTS_IN_SIDE; i++) {
+        colorData[i - FRONT_VERTEX] = colorBufferData[i];
+    }
+
+    return colorData;
+}
+
+GLfloat * Cube::getColorBack() {
+    GLfloat * colorData = new GLfloat[NUM_POINTS_IN_SIDE];
+
+    for (int i = BACK_VERTEX; i < BACK_VERTEX + NUM_POINTS_IN_SIDE; i++) {
+        colorData[i - BACK_VERTEX] = colorBufferData[i];
+    }
+
+    return colorData;
+}
+
+GLfloat * Cube::getColorLeft() {
+    GLfloat * colorData = new GLfloat[NUM_POINTS_IN_SIDE];
+
+    for (int i = LEFT_VERTEX; i < LEFT_VERTEX + NUM_POINTS_IN_SIDE; i++) {
+        colorData[i - LEFT_VERTEX] = colorBufferData[i];
+    }
+
+    return colorData;
+}
+
+GLfloat * Cube::getColorRight() {
+    GLfloat * colorData = new GLfloat[NUM_POINTS_IN_SIDE];
+
+    for (int i = RIGHT_VERTEX; i < RIGHT_VERTEX + NUM_POINTS_IN_SIDE; i++) {
+        colorData[i - RIGHT_VERTEX] = colorBufferData[i];
+    }
+
+    return colorData;
+}
+
 
 void Cube::setColorTop(GLfloat colorArray[]) {
     for (int i = TOP_VERTEX; i < TOP_VERTEX + NUM_POINTS_IN_SIDE; i++) {

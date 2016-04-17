@@ -38,6 +38,11 @@
 #define BACK_VERTEX 72
 #define FRONT_VERTEX (BACK_VERTEX + NUM_POINTS_IN_SIDE)
 
+#define NO_ROTATE 0
+#define ROTATE_TOP 1
+#define ROTATE_RIGHT 2
+#define ROTATE_BOTTOM 3
+#define ROTATE_LEFT 4
 
 class Cube {
 protected:
@@ -52,11 +57,14 @@ protected:
     GLfloat colorBufferData[NUM_POINTS];
 
 public:
+    Cube();
     Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[]);
     ~Cube();
 
     void rotate(glm::vec3 axis, glm::vec3 angle);
     void rotate(glm::vec3 angle);
+    void rotateColor(int ROTATE_TO);
+
     void translate(glm::vec3 translation);
     void scale(glm::vec3 scalingFactor);
 
@@ -72,6 +80,13 @@ public:
 
     void setVertexBufferData(GLfloat vertexArray[]);
     void setColorBufferData(GLfloat colorArray[]);
+
+    GLfloat * getColorTop();
+    GLfloat * getColorBottom();
+    GLfloat * getColorFront();
+    GLfloat * getColorBack();
+    GLfloat * getColorLeft();
+    GLfloat * getColorRight();
 
     void setColorTop(GLfloat colorArray[]);
     void setColorBottom(GLfloat colorArray[]);
