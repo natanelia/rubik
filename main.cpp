@@ -27,12 +27,20 @@ using namespace glm;
 #include "cube.hpp"
 
 #define NO_ROTATE 0
-#define ROTATE_TOP 1
-#define ROTATE_RIGHT 2
-#define ROTATE_BOTTOM 3
-#define ROTATE_LEFT 4
 
+#define ROTATE_LEFT_TO_TOP 1
+#define ROTATE_LEFT_TO_BOTTOM 2
+#define ROTATE_CENTER_TO_TOP 3
+#define ROTATE_CENTER_TO_BOTTOM 4
+#define ROTATE_RIGHT_TO_TOP 5
+#define ROTATE_RIGHT_TO_BOTTOM 6
 
+#define ROTATE_TOP_TO_LEFT 7
+#define ROTATE_TOP_TO_RIGHT 8
+#define ROTATE_MIDDLE_TO_LEFT 9
+#define ROTATE_MIDDLE_TO_RIGHT 10
+#define ROTATE_BOTTOM_TO_LEFT 11
+#define ROTATE_BOTTOM_TO_RIGHT 12
 
 // Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
 // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
@@ -253,18 +261,9 @@ int main( void )
         // Use our shader
         glUseProgram(programID);
 
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !keyLock) {
-            printf("KEY D PRESSED\n");
-            doAnimate = ROTATE_RIGHT;
-
-            startTime = currentTime;
-            lastFrameTime = currentTime;
-            keyLock = true;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !keyLock) {
-            printf("KEY A PRESSED\n");
-            doAnimate = ROTATE_LEFT;
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && !keyLock) {
+            printf("KEY Q PRESSED\n");
+            doAnimate = ROTATE_TOP_TO_LEFT;
 
             startTime = currentTime;
             lastFrameTime = currentTime;
@@ -273,7 +272,34 @@ int main( void )
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !keyLock) {
             printf("KEY W PRESSED\n");
-            doAnimate = ROTATE_TOP;
+            doAnimate = ROTATE_TOP_TO_RIGHT;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !keyLock) {
+            printf("KEY A PRESSED\n");
+            doAnimate = ROTATE_MIDDLE_TO_LEFT;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && !keyLock) {
+            printf("KEY S PRESSED\n");
+            doAnimate = ROTATE_MIDDLE_TO_RIGHT;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && !keyLock) {
+            printf("KEY Z PRESSED\n");
+            doAnimate = ROTATE_BOTTOM_TO_LEFT;
 
             startTime = currentTime;
             lastFrameTime = currentTime;
@@ -282,13 +308,66 @@ int main( void )
 
         if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !keyLock) {
             printf("KEY X PRESSED\n");
-            doAnimate = ROTATE_BOTTOM;
+            doAnimate = ROTATE_BOTTOM_TO_RIGHT;
 
             startTime = currentTime;
             lastFrameTime = currentTime;
             keyLock = true;
         }
 
+        if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && !keyLock) {
+            printf("KEY U PRESSED\n");
+            doAnimate = ROTATE_LEFT_TO_TOP;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && !keyLock) {
+            printf("KEY J PRESSED\n");
+            doAnimate = ROTATE_LEFT_TO_BOTTOM;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS && !keyLock) {
+            printf("KEY I PRESSED\n");
+            doAnimate = ROTATE_CENTER_TO_TOP;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS && !keyLock) {
+            printf("KEY K PRESSED\n");
+            doAnimate = ROTATE_CENTER_TO_BOTTOM;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !keyLock) {
+            printf("KEY O PRESSED\n");
+            doAnimate = ROTATE_RIGHT_TO_TOP;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && !keyLock) {
+            printf("KEY L PRESSED\n");
+            doAnimate = ROTATE_RIGHT_TO_BOTTOM;
+
+            startTime = currentTime;
+            lastFrameTime = currentTime;
+            keyLock = true;
+        }
 
         float deltaTime = (float)(currentTime - lastFrameTime);
         lastFrameTime = currentTime;
@@ -303,26 +382,150 @@ int main( void )
         if (currentTime - startTime <= 1.0131f && doAnimate != NO_ROTATE) {
             glm::vec3 __rotation;
             switch (doAnimate) {
-                case ROTATE_RIGHT:
-                    __rotation = glm::vec3(0.0f, -M_PI * deltaTime, 0.0f);
-                    break;
-                case ROTATE_LEFT:
-                    __rotation = glm::vec3(0.0f, M_PI * deltaTime, 0.0f);
-                    break;
-                case ROTATE_TOP:
-                    __rotation = glm::vec3(-M_PI * deltaTime, 0.0f, 0.0f);
-                    break;
-                case ROTATE_BOTTOM:
-                    __rotation = glm::vec3(M_PI * deltaTime, 0.0f, 0.0f);
-                    break;
-            }
+                case ROTATE_LEFT_TO_TOP:
+                    __rotation = glm::vec3(-M_PI * deltaTime, 0.0f, 0.0f); // TO_TOP
 
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 1; j++) {
-                    for (int k = 0; k < 3; k++) {
-                       cubes[i][j][k].rotate(__rotation);
+                    for (int i = 0; i < 1; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
                     }
-                }
+
+                    break;
+                case ROTATE_LEFT_TO_BOTTOM:
+                    __rotation = glm::vec3(M_PI * deltaTime, 0.0f, 0.0f); // TO_BOTTOM
+
+                    for (int i = 0; i < 1; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_CENTER_TO_TOP:
+                    __rotation = glm::vec3(-M_PI * deltaTime, 0.0f, 0.0f); // TO_TOP
+
+                    for (int i = 1; i < 2; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_CENTER_TO_BOTTOM:
+                    __rotation = glm::vec3(M_PI * deltaTime, 0.0f, 0.0f); // TO_BOTTOM
+
+                    for (int i = 1; i < 2; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_RIGHT_TO_TOP:
+                    __rotation = glm::vec3(-M_PI * deltaTime, 0.0f, 0.0f); // TO_TOP
+
+                    for (int i = 2; i < 3; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_RIGHT_TO_BOTTOM:
+                    __rotation = glm::vec3(M_PI * deltaTime, 0.0f, 0.0f); // TO_BOTTOM
+
+                    for (int i = 2; i < 3; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_TOP_TO_LEFT:
+                    __rotation = glm::vec3(0.0f, M_PI * deltaTime, 0.0f); // TO_LEFT
+                    
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 0; j < 1; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_TOP_TO_RIGHT:
+                    __rotation = glm::vec3(0.0f, -M_PI * deltaTime, 0.0f); // TO_RIGHT
+
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 0; j < 1; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_MIDDLE_TO_LEFT:
+                    __rotation = glm::vec3(0.0f, M_PI * deltaTime, 0.0f); // TO_LEFT
+
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 1; j < 2; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_MIDDLE_TO_RIGHT:
+                    __rotation = glm::vec3(0.0f, -M_PI * deltaTime, 0.0f); // TO_RIGHT
+
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 1; j < 2; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_BOTTOM_TO_LEFT:
+                    __rotation = glm::vec3(0.0f, M_PI * deltaTime, 0.0f); // TO_LEFT
+                    
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 2; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
+                case ROTATE_BOTTOM_TO_RIGHT:
+                    __rotation = glm::vec3(0.0f, -M_PI * deltaTime, 0.0f); // TO_RIGHT
+
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 2; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                               cubes[i][j][k].rotate(__rotation);
+                            }
+                        }
+                    }
+                    
+                    break;
             }
         } else {
             keyLock = false;
