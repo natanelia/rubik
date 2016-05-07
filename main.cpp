@@ -45,6 +45,19 @@ using namespace glm;
 
 // Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
 // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
+
+/*
+ Represents a point light
+ */
+struct Light {
+    glm::vec3 position;
+    glm::vec3 intensities; //a.k.a. the color of the light
+};
+
+Light gLight;
+
+static GLfloat ambientLight;
+
 static GLfloat vd[] = {
      1.0f, 1.0f, 1.0f, // Right
      1.0f,-1.0f,-1.0f,
@@ -151,7 +164,7 @@ static GLfloat gd[] = {
 // Projection matrix : 45deg Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 glm::mat4 ProjectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 // Camera matrix
-glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(-8,8,12), glm::vec3(0,0,0), glm::vec3(0,1,0));
+glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(8,8,12), glm::vec3(0,0,0), glm::vec3(0,1,0));
 
 int main( void )
 {
@@ -205,6 +218,8 @@ int main( void )
 
     // Create and compile our GLSL program from the shaders
     GLuint programID = LoadShaders( "TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader" );
+    
+ 
 
 //    GLuint Texture = loadDDS("uvtemplate.DDS");
 
@@ -306,7 +321,7 @@ int main( void )
         // Use our shader
         glUseProgram(programID);
 
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && !keyLock) {
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !keyLock) {
             printf("KEY Q PRESSED\n");
             doAnimate = ROTATE_TOP_TO_LEFT;
 
@@ -315,7 +330,7 @@ int main( void )
             keyLock = true;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !keyLock) {
+        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && !keyLock) {
             printf("KEY W PRESSED\n");
             doAnimate = ROTATE_TOP_TO_RIGHT;
 
@@ -324,7 +339,7 @@ int main( void )
             keyLock = true;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !keyLock) {
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && !keyLock) {
             printf("KEY A PRESSED\n");
             doAnimate = ROTATE_MIDDLE_TO_LEFT;
 
@@ -333,7 +348,7 @@ int main( void )
             keyLock = true;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && !keyLock) {
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !keyLock) {
             printf("KEY S PRESSED\n");
             doAnimate = ROTATE_MIDDLE_TO_RIGHT;
 
@@ -342,7 +357,7 @@ int main( void )
             keyLock = true;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && !keyLock) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !keyLock) {
             printf("KEY Z PRESSED\n");
             doAnimate = ROTATE_BOTTOM_TO_LEFT;
 
@@ -351,7 +366,7 @@ int main( void )
             keyLock = true;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !keyLock) {
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && !keyLock) {
             printf("KEY X PRESSED\n");
             doAnimate = ROTATE_BOTTOM_TO_RIGHT;
 

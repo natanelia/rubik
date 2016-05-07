@@ -56,10 +56,16 @@ protected:
 
     GLuint colorBuffer;
     GLfloat colorBufferData[72];
+    
+    //NORMAL
+    GLuint normalBuffer = NULL;
+    GLfloat normals[NUM_POINTS];
 
     GLuint programID;
     GLuint Texture;
     GLuint TextureID;
+    GLuint LightID1;
+    GLuint LightID2;
 public:
     Cube();
     Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[]);

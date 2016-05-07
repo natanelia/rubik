@@ -17,6 +17,11 @@ Cube::Cube() {
 Cube::Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[]) {
 
     programID = LoadShaders( "TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader" );
+    
+    // Get a handle for our "LightPosition" uniform
+    LightID1 = glGetUniformLocation(programID, "LightPosition1_worldspace");
+    LightID2 = glGetUniformLocation(programID, "LightPosition2_worldspace");
+    
     Texture = loadBMP_custom("uvtemplateX.bmp");
     //Texture = loadDDS("uvtemplate.DDS");
 
@@ -31,6 +36,9 @@ Cube::Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[]) {
         }
     }
 
+//    for(int i=0; i< NUM_POINTS; i++){
+//        normalBufferData [i] = 0;
+//    }
 
     for (int i = 0; i < 72; i++) {
         colorBufferData[i] = colorArray[i];
@@ -181,14 +189,109 @@ void Cube::draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatri
 
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
+    //CUBE
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBufferData), vertexBufferData, GL_STATIC_DRAW);
+    
 
+    //COLOR
     glGenBuffers(1, &colorBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(colorBufferData), colorBufferData, GL_STATIC_DRAW);
+    
 
+    
+    //CALCULATE NORMAL
+//    normals = {
+//        1.0f, 1.0f, 1.0f, // Right
+//        1.0f,-1.0f,-1.0f,
+//        1.0f, 1.0f,-1.0f,
+//        
+//        1.0f,-1.0f,-1.0f,
+//        1.0f, 1.0f, 1.0f,
+//        1.0f,-1.0f, 1.0f,
+//        
+//        -1.0f,-1.0f,-1.0f, // Left
+//        -1.0f,-1.0f, 1.0f,
+//        -1.0f, 1.0f, 1.0f,
+//        
+//        -1.0f,-1.0f,-1.0f,
+//        -1.0f, 1.0f, 1.0f,
+//        -1.0f, 1.0f,-1.0f,
+//        
+//        -1.0f, 1.0f,-1.0f, // Top
+//        1.0f, 1.0f, 1.0f,
+//        1.0f, 1.0f,-1.0f,
+//        
+//        -1.0f, 1.0f,-1.0f,
+//        -1.0f, 1.0f, 1.0f,
+//        1.0f, 1.0f, 1.0f,
+//        
+//        -1.0f,-1.0f,-1.0f, // Bottom
+//        1.0f,-1.0f, 1.0f,
+//        -1.0f,-1.0f, 1.0f,
+//        
+//        1.0f,-1.0f, 1.0f,
+//        1.0f,-1.0f,-1.0f,
+//        -1.0f,-1.0f,-1.0f,
+//        
+//        -1.0f,-1.0f, 1.0f, // Back
+//        1.0f, 1.0f, 1.0f,
+//        1.0f,-1.0f, 1.0f,
+//        
+//        -1.0f,-1.0f, 1.0f,
+//        -1.0f, 1.0f, 1.0f,
+//        1.0f, 1.0f, 1.0f,
+//        
+//        1.0f,-1.0f,-1.0f, // Top
+//        1.0f, 1.0f,-1.0f,
+//        -1.0f, 1.0f,-1.0f,
+//        
+//        -1.0f,-1.0f,-1.0f,
+//        1.0f,-1.0f,-1.0f,
+//        -1.0f, 1.0f,-1.0f
+//    };
+    
+    for(int i = 0; i < (NUM_POINTS/9); i++){
+        GLfloat a1 = vertexBufferData[i*3+0];
+        GLfloat a2 = vertexBufferData[i*3+1];
+        GLfloat a3 = vertexBufferData[i*3+2];
+        GLfloat a4 = vertexBufferData[i*3+3];
+        GLfloat a5 = vertexBufferData[i*3+4];
+        GLfloat a6 = vertexBufferData[i*3+5];
+        GLfloat a7 = vertexBufferData[i*3+6];
+        GLfloat a8 = vertexBufferData[i*3+7];
+        GLfloat a9 = vertexBufferData[i*3+8];
+        
+        GLfloat b1 = (a5-a2) * (a9-a3) - (a6-a3) * (a8-a2);
+        GLfloat b2 = (a6 - a3) * (a7 - a1) - (a4 - a1) * (a9- a3);
+        GLfloat b3 = (a4 - a1) * (a8 - a2) - (a5 - a2) * (a7- a1);
+        
+        normals[i*3+0] = b1 == 0 || b1 == -0 ? b1 : b1/fabs(b1);
+        normals[i*3+1] = b2 == 0 || b2 == -0 ? b2 : b2/fabs(b2);
+        normals[i*3+2] = b3 == 0 || b3 == -0 ? b3 : b3/fabs(b3);
+        normals[i*3+3] = b1 == 0 || b1 == -0 ? b1 : b1/fabs(b1);
+        normals[i*3+4] = b2 == 0 || b2 == -0 ? b2 : b2/fabs(b2);
+        normals[i*3+5] = b3 == 0 || b3 == -0 ? b3 : b3/fabs(b3);
+        normals[i*3+6] = b1 == 0 || b1 == -0 ? b1 : b1/fabs(b1);
+        normals[i*3+7] = b2 == 0 || b2 == -0 ? b2 : b2/fabs(b2);
+        normals[i*3+8] = b3 == 0 || b3 == -0 ? b3 : b3/fabs(b3);
+    }
+    
+    for(int i=0; i< NUM_POINTS; i++)
+        std::cout << "normal" << normals[i] << std::endl;
+    
+    glGenBuffers(1, &normalBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+
+    glm::vec3 lightPos = glm::vec3(8,8,8);
+    glUniform3f(LightID1, lightPos.x, lightPos.y, lightPos.z);
+    
+    glm::vec3 lightPos2 = glm::vec3(8,-8,-8);
+    glUniform3f(LightID2, lightPos2.x, lightPos2.y, lightPos2.z);
+    
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, Texture);
@@ -219,11 +322,24 @@ void Cube::draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatri
                           (void*)0                          // array buffer offset
                           );
     
+    // 3rd attribute buffer : normals
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+    glVertexAttribPointer(
+                          2,                                // attribute
+                          3,                                // size
+                          GL_FLOAT,                         // type
+                          GL_FALSE,                         // normalized?
+                          0,                                // stride
+                          (void*)0                          // array buffer offset
+                          );
+    
     // Draw the triangle !
     glDrawArrays(GL_TRIANGLES, 0, NUM_POINTS / 3); // 12*3 indices starting at 0 -> 12 triangles
     
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
 }
 
 void Cube::setAxis(glm::vec3 axis) {
