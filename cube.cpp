@@ -15,12 +15,24 @@ Cube::Cube() {
 }
 
 Cube::Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[]) {
+
+    programID = LoadShaders( "TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader" );
+    Texture = loadBMP_custom("uvtemplateX.bmp");
+    //Texture = loadDDS("uvtemplate.DDS");
+
+    // Get a handle for our "myTextureSampler" uniform
+    TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+
     for (int i = 0; i < NUM_POINTS; i++) {
         if (vertexArray[i] == 1.0f) {
             vertexBufferData[i] = vertexArray[i] - 0.1f;
         } else {
             vertexBufferData[i] = vertexArray[i];
         }
+    }
+
+
+    for (int i = 0; i < 72; i++) {
         colorBufferData[i] = colorArray[i];
     }
 
@@ -172,10 +184,16 @@ void Cube::draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatri
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBufferData), vertexBufferData, GL_STATIC_DRAW);
-    
+
     glGenBuffers(1, &colorBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(colorBufferData), colorBufferData, GL_STATIC_DRAW);
+
+    // Bind our texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, Texture);
+    // Set our "myTextureSampler" sampler to user Texture Unit 0
+    glUniform1i(TextureID, 0);
     
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -194,7 +212,7 @@ void Cube::draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatri
     glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
     glVertexAttribPointer(
                           1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-                          3,                                // size
+                          2,                                // size
                           GL_FLOAT,                         // type
                           GL_FALSE,                         // normalized?
                           0,                                // stride
@@ -219,7 +237,7 @@ void Cube::setVertexBufferData(GLfloat vertexArray[]) {
 }
 
 void Cube::setColorBufferData(GLfloat colorArray[]) {
-    for (int i = 0; i < NUM_POINTS; i++) {
+    for (int i = 0; i < 72; i++) {
         colorBufferData[i] = colorArray[i];
     }
 }

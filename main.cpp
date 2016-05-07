@@ -24,6 +24,7 @@ GLFWwindow* window;
 using namespace glm;
 
 #include <common/shader.hpp>
+#include <common/texture.hpp>
 #include "cube.hpp"
 
 #define NO_ROTATE 0
@@ -46,109 +47,111 @@ using namespace glm;
 // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
 static GLfloat vd[] = {
      1.0f, 1.0f, 1.0f, // Right
-     1.0f, 1.0f,-1.0f,
      1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f,-1.0f,
 
-     1.0f, 1.0f, 1.0f,
      1.0f,-1.0f,-1.0f,
+     1.0f, 1.0f, 1.0f,
      1.0f,-1.0f, 1.0f,
-     
+
     -1.0f,-1.0f,-1.0f, // Left
-    -1.0f, 1.0f, 1.0f,
     -1.0f,-1.0f, 1.0f,
-     
     -1.0f, 1.0f, 1.0f,
+
     -1.0f,-1.0f,-1.0f,
+    -1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f,-1.0f,
-     
+
     -1.0f, 1.0f,-1.0f, // Top
+     1.0f, 1.0f, 1.0f,
      1.0f, 1.0f,-1.0f,
-     1.0f, 1.0f, 1.0f,
-     
+
     -1.0f, 1.0f,-1.0f,
-     1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f,
-     
+     1.0f, 1.0f, 1.0f,
+
     -1.0f,-1.0f,-1.0f, // Bottom
-    -1.0f,-1.0f, 1.0f,
      1.0f,-1.0f, 1.0f,
-     
-    -1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f, 1.0f,
+
      1.0f,-1.0f, 1.0f,
      1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f,-1.0f,
 
     -1.0f,-1.0f, 1.0f, // Back
      1.0f, 1.0f, 1.0f,
      1.0f,-1.0f, 1.0f,
-     
+
     -1.0f,-1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f,
      1.0f, 1.0f, 1.0f,
-     
+
      1.0f,-1.0f,-1.0f, // Top
      1.0f, 1.0f,-1.0f,
     -1.0f, 1.0f,-1.0f,
-     
+
     -1.0f,-1.0f,-1.0f,
      1.0f,-1.0f,-1.0f,
     -1.0f, 1.0f,-1.0f
 };
 
 // One color for each vertex. They were generated randomly.
-static GLfloat cd[] = {
-    1.0f,  0.0f,  0.0f, // Right
-    1.0f,  0.0f,  0.0f,
-    1.0f,  0.0f,  0.0f,
+// Right - Left - Top - Bottom - Back - Front (each got 6 rows)
+static GLfloat gd[] = {
+    0.668104f, 1.0f-0.000013f, //RIGHT 1
+    0.335973f, 1.0f-0.335903f,
+    0.667979f, 1.0f-0.335851f,
 
-    1.0f,  0.0f,  0.0f,
-    1.0f,  0.0f,  0.0f,
-    1.0f,  0.0f,  0.0f,
+    0.335973f, 1.0f-0.335903f, //RIGHT 2
+    0.668104f, 1.0f-0.000013f,
+    0.336098f, 1.0f-0.000071f,
 
-    1.0f,  0.5f,  0.0f, // Left
-    1.0f,  0.5f,  0.0f,
-    1.0f,  0.5f,  0.0f,
+    0.000059f, 1.0f-0.000004f, //LEFT 1
+    0.000103f, 1.0f-0.336048f,
+    0.335973f, 1.0f-0.335903f,
 
-    1.0f,  0.5f,  0.0f,
-    1.0f,  0.5f,  0.0f,
-    1.0f,  0.5f,  0.0f,
+    0.000059f, 1.0f-0.000004f, //LEFT 2
+    0.335973f, 1.0f-0.335903f,
+    0.336098f, 1.0f-0.000071f,
 
-    1.0f,  1.0f,  0.0f, // Top
-    1.0f,  1.0f,  0.0f,
-    1.0f,  1.0f,  0.0f,
+    0.000103f, 1.0f-0.336048f, //TOP 2
+    0.336024f, 1.0f-0.671877f,
+    0.335973f, 1.0f-0.335903f,
 
-    1.0f,  1.0f,  0.0f,
-    1.0f,  1.0f,  0.0f,
-    1.0f,  1.0f,  0.0f,
+    0.000103f, 1.0f-0.336048f, //TOP 1
+    0.000004f, 1.0f-0.671870f,
+    0.336024f, 1.0f-0.671877f,
 
-    0.0f,  1.0f,  0.0f, // Bottom
-    0.0f,  1.0f,  0.0f,
-    0.0f,  1.0f,  0.0f,
+    0.667979f, 1.0f-0.335851f, //BOTTOM 1
+    0.336024f, 1.0f-0.671877f,
+    0.667969f, 1.0f-0.671889f,
 
-    0.0f,  1.0f,  0.0f,
-    0.0f,  1.0f,  0.0f,
-    0.0f,  1.0f,  0.0f,
+    0.667979f, 1.0f-0.335851f, //BOTTOM 2
+    0.335973f, 1.0f-0.335903f,
+    0.336024f, 1.0f-0.671877f,
 
-    0.0f,  0.25f, 1.0f, // Back
-    0.0f,  0.25f, 1.0f,
-    0.0f,  0.25f, 1.0f,
+    1.000023f, 1.0f-0.000013f, //BACK 1
+    0.667979f, 1.0f-0.335851f,
+    0.999958f, 1.0f-0.336064f,
 
-    0.0f,  0.25f, 1.0f,
-    0.0f,  0.25f, 1.0f,
-    0.0f,  0.25f, 1.0f,
+    1.000023f, 1.0f-0.000013f, //BACK 2
+    0.668104f, 1.0f-0.000013f,
+    0.667979f, 1.0f-0.335851f,
 
-    0.5f,  0.0f,  1.0f, // Front
-    0.5f,  0.0f,  1.0f,
-    0.5f,  0.0f,  1.0f,
+    1.000004f, 1.0f-0.671847f, //FRONT 1
+    0.999958f, 1.0f-0.336064f,
+    0.667979f, 1.0f-0.335851f,
 
-    0.5f,  0.0f,  1.0f,
-    0.5f,  0.0f,  1.0f,
-    0.5f,  0.0f,  1.0f
+    0.667969f, 1.0f-0.671889f, //FRONT 2
+    1.000004f, 1.0f-0.671847f,
+    0.667979f, 1.0f-0.335851f
 };
+
 
 // Projection matrix : 45deg Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 glm::mat4 ProjectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 // Camera matrix
-glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(8,-8,-12), glm::vec3(0,0,0), glm::vec3(0,-1,0));
+glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(-8,8,12), glm::vec3(0,0,0), glm::vec3(0,1,0));
 
 int main( void )
 {
@@ -167,7 +170,7 @@ int main( void )
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
-    window = glfwCreateWindow( 1024, 768, "Rubrik", NULL, NULL);
+    window = glfwCreateWindow( 1024, 768, "Rubik", NULL, NULL);
     if( window == NULL ){
         fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
         getchar();
@@ -201,7 +204,13 @@ int main( void )
     glBindVertexArray(VertexArrayID);
 
     // Create and compile our GLSL program from the shaders
-    GLuint programID = LoadShaders( "TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader" );
+    GLuint programID = LoadShaders( "TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader" );
+
+//    GLuint Texture = loadDDS("uvtemplate.DDS");
+
+//    // Get a handle for our "myTextureSampler" uniform
+//    GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+
 
     // Get a handle for our "MVP" uniform
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
@@ -243,41 +252,41 @@ int main( void )
     cubesCode[2][2][2] = 333;
     
     Cube cubes[3][3][3];
-    cubes[0][0][0] = Cube("111", vd, cd);
-    cubes[0][0][1] = Cube("112", vd, cd);
-    cubes[0][0][2] = Cube("113", vd, cd);
+    cubes[0][0][0] = Cube("111", vd, gd);
+    cubes[0][0][1] = Cube("112", vd, gd);
+    cubes[0][0][2] = Cube("113", vd, gd);
 
-    cubes[0][1][0] = Cube("121", vd, cd);
-    cubes[0][1][1] = Cube("122", vd, cd);
-    cubes[0][1][2] = Cube("123", vd, cd);
+    cubes[0][1][0] = Cube("121", vd, gd);
+    cubes[0][1][1] = Cube("122", vd, gd);
+    cubes[0][1][2] = Cube("123", vd, gd);
 
-    cubes[0][2][0] = Cube("131", vd, cd);
-    cubes[0][2][1] = Cube("132", vd, cd);
-    cubes[0][2][2] = Cube("133", vd, cd);
+    cubes[0][2][0] = Cube("131", vd, gd);
+    cubes[0][2][1] = Cube("132", vd, gd);
+    cubes[0][2][2] = Cube("133", vd, gd);
 
-    cubes[1][0][0] = Cube("211", vd, cd);
-    cubes[1][0][1] = Cube("212", vd, cd);
-    cubes[1][0][2] = Cube("213", vd, cd);
+    cubes[1][0][0] = Cube("211", vd, gd);
+    cubes[1][0][1] = Cube("212", vd, gd);
+    cubes[1][0][2] = Cube("213", vd, gd);
 
-    cubes[1][1][0] = Cube("221", vd, cd);
-    // cubes[1][1][1] = Cube("222", vd, cd);
-    cubes[1][1][2] = Cube("223", vd, cd);
+    cubes[1][1][0] = Cube("221", vd, gd);
+    // cubes[1][1][1] = Cube("222", vd, gd);
+    cubes[1][1][2] = Cube("223", vd, gd);
 
-    cubes[1][2][0] = Cube("231", vd, cd);
-    cubes[1][2][1] = Cube("232", vd, cd);
-    cubes[1][2][2] = Cube("233", vd, cd);
+    cubes[1][2][0] = Cube("231", vd, gd);
+    cubes[1][2][1] = Cube("232", vd, gd);
+    cubes[1][2][2] = Cube("233", vd, gd);
 
-    cubes[2][0][0] = Cube("311", vd, cd);
-    cubes[2][0][1] = Cube("312", vd, cd);
-    cubes[2][0][2] = Cube("313", vd, cd);
+    cubes[2][0][0] = Cube("311", vd, gd);
+    cubes[2][0][1] = Cube("312", vd, gd);
+    cubes[2][0][2] = Cube("313", vd, gd);
 
-    cubes[2][1][0] = Cube("321", vd, cd);
-    cubes[2][1][1] = Cube("322", vd, cd);
-    cubes[2][1][2] = Cube("323", vd, cd);
+    cubes[2][1][0] = Cube("321", vd, gd);
+    cubes[2][1][1] = Cube("322", vd, gd);
+    cubes[2][1][2] = Cube("323", vd, gd);
 
-    cubes[2][2][0] = Cube("331", vd, cd);
-    cubes[2][2][1] = Cube("332", vd, cd);
-    cubes[2][2][2] = Cube("333", vd, cd);
+    cubes[2][2][0] = Cube("331", vd, gd);
+    cubes[2][2][1] = Cube("332", vd, gd);
+    cubes[2][2][2] = Cube("333", vd, gd);
 
 
     int nbFrames = 0;
@@ -415,10 +424,10 @@ int main( void )
             lastTime += 1.0;
         }
 
-        
+
         if (currentTime - startTime <= 1.0131f && doAnimate != NO_ROTATE) {
             glm::vec3 __rotation;
-         
+
 
             switch (doAnimate) {
                 case ROTATE_LEFT_TO_TOP:
@@ -443,7 +452,7 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_CENTER_TO_TOP:
                     __rotation = glm::vec3(-M_PI * deltaTime, 0.0f, 0.0f); // TO_TOP
@@ -455,7 +464,7 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_CENTER_TO_BOTTOM:
                     __rotation = glm::vec3(M_PI * deltaTime, 0.0f, 0.0f); // TO_BOTTOM
@@ -467,7 +476,7 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_RIGHT_TO_TOP:
                     __rotation = glm::vec3(-M_PI * deltaTime, 0.0f, 0.0f); // TO_TOP
@@ -479,7 +488,7 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_RIGHT_TO_BOTTOM:
                     __rotation = glm::vec3(M_PI * deltaTime, 0.0f, 0.0f); // TO_BOTTOM
@@ -491,11 +500,11 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_TOP_TO_LEFT:
                     __rotation = glm::vec3(0.0f, M_PI * deltaTime, 0.0f); // TO_LEFT
-                    
+
                     for (int i = 0; i < 3; i++) {
                         for (int j = 0; j < 1; j++) {
                             for (int k = 0; k < 3; k++) {
@@ -503,7 +512,7 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_TOP_TO_RIGHT:
                     __rotation = glm::vec3(0.0f, -M_PI * deltaTime, 0.0f); // TO_RIGHT
@@ -515,7 +524,7 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_MIDDLE_TO_LEFT:
                     __rotation = glm::vec3(0.0f, M_PI * deltaTime, 0.0f); // TO_LEFT
@@ -527,7 +536,7 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_MIDDLE_TO_RIGHT:
                     __rotation = glm::vec3(0.0f, -M_PI * deltaTime, 0.0f); // TO_RIGHT
@@ -539,11 +548,11 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_BOTTOM_TO_LEFT:
                     __rotation = glm::vec3(0.0f, M_PI * deltaTime, 0.0f); // TO_LEFT
-                    
+
                     for (int i = 0; i < 3; i++) {
                         for (int j = 2; j < 3; j++) {
                             for (int k = 0; k < 3; k++) {
@@ -551,7 +560,7 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
                 case ROTATE_BOTTOM_TO_RIGHT:
                     __rotation = glm::vec3(0.0f, -M_PI * deltaTime, 0.0f); // TO_RIGHT
@@ -563,11 +572,11 @@ int main( void )
                             }
                         }
                     }
-                    
+
                     break;
             }
         } else {
-            
+
             int temp_cubesCode[3][3];
             Cube temp_cube[3][3][3];
             switch (doAnimate) {
@@ -575,7 +584,7 @@ int main( void )
                     for(int i = 0; i < 1; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
@@ -589,7 +598,7 @@ int main( void )
                     for(int i = 0; i < 1; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -600,12 +609,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_LEFT_TO_BOTTOM:
                     for(int i = 0; i < 1; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
@@ -619,7 +628,7 @@ int main( void )
                     for(int i = 0; i < 1; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -630,12 +639,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_CENTER_TO_TOP:
                     for(int i = 1; i < 2; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
@@ -649,7 +658,7 @@ int main( void )
                     for(int i = 1; i < 2; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -660,12 +669,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_CENTER_TO_BOTTOM:
                     for(int i = 1; i < 2; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
@@ -679,7 +688,7 @@ int main( void )
                     for(int i = 1; i < 2; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -690,12 +699,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_RIGHT_TO_TOP:
                     for(int i = 2; i < 3; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
@@ -709,7 +718,7 @@ int main( void )
                     for(int i = 2; i < 3; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -720,12 +729,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_RIGHT_TO_BOTTOM:
                     for(int i = 2; i < 3; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
@@ -739,7 +748,7 @@ int main( void )
                     for(int i = 2; i < 3; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -750,12 +759,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_TOP_TO_LEFT:
                     for(int i = 0; i < 3; i++){
                         for(int j = 0; j < 1; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
@@ -769,7 +778,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 0; j < 1; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -780,12 +789,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_TOP_TO_RIGHT:
                     for(int i = 0; i < 3; i++){
                         for(int j = 0; j < 1; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
@@ -799,7 +808,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 0; j < 1; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -810,12 +819,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_MIDDLE_TO_LEFT:
                     for(int i = 0; i < 3; i++){
                         for(int j = 1; j < 2; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
@@ -829,7 +838,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 1; j < 2; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -840,12 +849,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_MIDDLE_TO_RIGHT:
                     for(int i = 0; i < 3; i++){
                         for(int j = 1; j < 2; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
@@ -859,7 +868,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 1; j < 2; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -870,12 +879,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_BOTTOM_TO_LEFT:
                     for(int i = 0; i < 3; i++){
                         for(int j = 2; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
@@ -889,7 +898,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 2; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -900,12 +909,12 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 case ROTATE_BOTTOM_TO_RIGHT:
                     for(int i = 0; i < 3; i++){
                         for(int j = 2; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,cd);
+                                temp_cube[i][j][k] = Cube("111",vd,gd);
                                 temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
@@ -919,7 +928,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 2; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,cd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -930,7 +939,7 @@ int main( void )
                         }
                     }
                     break;
-                    
+
                 default:
                     break;
             }
@@ -946,7 +955,7 @@ int main( void )
                 }
             }
         }
-        
+
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();

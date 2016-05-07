@@ -22,20 +22,21 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include <common/shader.hpp>
+#include <common/texture.hpp>
 #include <cmath>
 
 #define NUM_SIDES 6
 #define NUM_POINTS (3 * 3 * 2 * NUM_SIDES)
-#define NUM_POINTS_IN_SIDE (NUM_POINTS / NUM_SIDES)
+#define NUM_POINTS_IN_SIDE 12
 
 // THE FOLLOWING DEFINES VERTEX INDEX START OF INSERTED vertexArray[] on constructor
-#define TOP_VERTEX 36
+#define TOP_VERTEX 24
 #define BOTTOM_VERTEX (TOP_VERTEX + NUM_POINTS_IN_SIDE)
 
 #define RIGHT_VERTEX 0
 #define LEFT_VERTEX (RIGHT_VERTEX + NUM_POINTS_IN_SIDE)
 
-#define BACK_VERTEX 72
+#define BACK_VERTEX 48
 #define FRONT_VERTEX (BACK_VERTEX + NUM_POINTS_IN_SIDE)
 
 #define NO_ROTATE 0
@@ -54,8 +55,11 @@ protected:
     GLfloat vertexBufferData[NUM_POINTS];
 
     GLuint colorBuffer;
-    GLfloat colorBufferData[NUM_POINTS];
+    GLfloat colorBufferData[72];
 
+    GLuint programID;
+    GLuint Texture;
+    GLuint TextureID;
 public:
     Cube();
     Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[]);
