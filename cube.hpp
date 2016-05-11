@@ -56,7 +56,7 @@ protected:
 
     GLuint colorBuffer;
     GLfloat colorBufferData[72];
-    
+
     //NORMAL
     GLuint normalBuffer;
     GLfloat normalBufferData[NUM_POINTS];
@@ -65,7 +65,8 @@ protected:
     GLuint Texture;
     GLuint TextureID;
     GLuint LightID1;
-   //  GLuint LightID2;
+    GLuint LightID2;
+
 public:
     Cube();
     Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[], GLfloat normalArray[]);
@@ -84,7 +85,7 @@ public:
     GLfloat * getColorBufferData();
     GLfloat * getNormalBufferData();
 
-    void draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatrix);
+    void draw(GLuint MatrixID, GLuint ModelMatrixID, GLuint ViewMatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatrix);
 
     void setModelMatrix(glm::mat4 matrix) { this->modelMatrix = matrix; }
     void setAxis(glm::vec3 axis);
@@ -106,8 +107,8 @@ public:
     void setColorBack(GLfloat colorArray[]);
     void setColorLeft(GLfloat colorArray[]);
     void setColorRight(GLfloat colorArray[]);
-    
+
     std::string getPosition() { return position; }
-    
-    
+
+
 };

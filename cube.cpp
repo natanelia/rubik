@@ -20,7 +20,7 @@ Cube::Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[], GL
 
     // Get a handle for our "LightPosition" uniform
     LightID1 = glGetUniformLocation(programID, "LightPosition1_worldspace");
-    // LightID2 = glGetUniformLocation(programID, "LightPosition2_worldspace");
+    LightID2 = glGetUniformLocation(programID, "LightPosition2_worldspace");
 
     Texture = loadBMP_custom("uvtemplateX.bmp");
     //Texture = loadDDS("uvtemplate.DDS");
@@ -188,10 +188,12 @@ GLfloat * Cube::getNormalBufferData() {
     return normalBufferData;
 }
 
-void Cube::draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatrix) {
+void Cube::draw(GLuint MatrixID, GLuint ModelMatrixID, GLuint ViewMatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatrix) {
     glm::mat4 MVP = ProjectionMatrix * ViewMatrix * this->getModelMatrix();
 
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+	glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &this->getModelMatrix()[0][0]);
+	glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
 
     //CUBE
     glGenBuffers(1, &vertexBuffer);
@@ -210,8 +212,11 @@ void Cube::draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatri
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(normalBufferData), normalBufferData, GL_STATIC_DRAW);
 
-    // glm::vec3 lightPos2 = glm::vec3(8,-8,-8);
-    // glUniform3f(LightID2, lightPos2.x, lightPos2.y, lightPos2.z);
+    glm::vec3 lightPos = glm::vec3(-6.0f, 4.0f, 6.0f);
+    glUniform3f(LightID1, lightPos.x, lightPos.y, lightPos.z);
+
+    glm::vec3 lightPos2 = glm::vec3(6.0f, 4.0f, -6.0f);
+    glUniform3f(LightID2, lightPos2.x, lightPos2.y, lightPos2.z);
 
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
@@ -219,8 +224,6 @@ void Cube::draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatri
     // Set our "myTextureSampler" sampler to user Texture Unit 0
     glUniform1i(TextureID, 0);
 
-    glm::vec3 lightPos = glm::vec3(6.0f, 6.0f, 8.0f);
-    glUniform3f(LightID1, lightPos.x, lightPos.y, lightPos.z);
 
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -279,6 +282,12 @@ void Cube::setVertexBufferData(GLfloat vertexArray[]) {
 void Cube::setColorBufferData(GLfloat colorArray[]) {
     for (int i = 0; i < 72; i++) {
         colorBufferData[i] = colorArray[i];
+    }
+}
+
+void Cube::setNormalBufferData(GLfloat normalArray[]) {
+    for (int i = 0; i < 72; i++) {
+        normalBufferData[i] = normalArray[i];
     }
 }
 

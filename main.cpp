@@ -50,18 +50,6 @@ using namespace glm;
 // Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
 // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
 
-/*
- Represents a point light
- */
-struct Light {
-    glm::vec3 position;
-    glm::vec3 intensities; //a.k.a. the color of the light
-};
-
-Light gLight;
-
-static GLfloat ambientLight;
-
 static GLfloat vd[] = {
      1.0f, 1.0f, 1.0f, // Right
      1.0f,-1.0f,-1.0f,
@@ -220,7 +208,8 @@ int main( void )
     // Projection matrix : 45deg Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
     glm::mat4 ProjectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // Camera matrix
-    glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(8,8,12), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    glm::vec3 CameraPosition = glm::vec3(8,8,12);
+    glm::mat4 ViewMatrix = glm::lookAt(CameraPosition, glm::vec3(0,0,0), glm::vec3(0,1,0));
 
     // Initialise GLFW
     if( !glfwInit() )
@@ -270,6 +259,7 @@ int main( void )
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
+
     // Create and compile our GLSL program from the shaders
     GLuint programID = LoadShaders( "TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader" );
 
@@ -283,6 +273,8 @@ int main( void )
 
     // Get a handle for our "MVP" uniform
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+    GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
+    GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
     int cubesCode[3][3][3];
     cubesCode[0][0][0] = 111;
     cubesCode[0][0][1] = 112;
@@ -374,6 +366,23 @@ int main( void )
 
         // Use our shader
         glUseProgram(programID);
+
+        float cpStep = 0.3f;
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && CameraPosition.y < 12.0f) {
+            CameraPosition.y += cpStep;
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && CameraPosition.y > -12.0f) {
+            CameraPosition.y -= cpStep;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && CameraPosition.x > -12.0f) {
+            CameraPosition.x -= cpStep;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && CameraPosition.x < 12.0f) {
+            CameraPosition.x += cpStep;
+        }
+        ViewMatrix = glm::lookAt(CameraPosition, glm::vec3(0,0,0), glm::vec3(0,1,0));
 
         if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && !keyLock) {
             printf("KEY Q PRESSED\n");
@@ -1020,7 +1029,7 @@ int main( void )
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 3; k++) {
-                   cubes[i][j][k].draw(MatrixID, ProjectionMatrix, ViewMatrix);
+                   cubes[i][j][k].draw(MatrixID, ModelMatrixID, ViewMatrixID, ProjectionMatrix, ViewMatrix);
                 }
             }
         }
@@ -1043,4 +1052,3 @@ int main( void )
 
     return 0;
 }
-
