@@ -58,17 +58,17 @@ protected:
     GLfloat colorBufferData[72];
     
     //NORMAL
-    GLuint normalBuffer = NULL;
-    GLfloat normals[NUM_POINTS];
+    GLuint normalBuffer;
+    GLfloat normalBufferData[NUM_POINTS];
 
     GLuint programID;
     GLuint Texture;
     GLuint TextureID;
     GLuint LightID1;
-    GLuint LightID2;
+   //  GLuint LightID2;
 public:
     Cube();
-    Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[]);
+    Cube(std::string position, GLfloat vertexArray[], GLfloat colorArray[], GLfloat normalArray[]);
     ~Cube();
 
     void rotate(glm::vec3 axis, glm::vec3 angle);
@@ -82,6 +82,7 @@ public:
     glm::vec3& getAxis();
     GLfloat * getVertexBufferData();
     GLfloat * getColorBufferData();
+    GLfloat * getNormalBufferData();
 
     void draw(GLuint MatrixID, glm::mat4 ProjectionMatrix, glm::mat4 ViewMatrix);
 
@@ -90,6 +91,7 @@ public:
 
     void setVertexBufferData(GLfloat vertexArray[]);
     void setColorBufferData(GLfloat colorArray[]);
+    void setNormalBufferData(GLfloat normalArray[]);
 
     GLfloat * getColorTop();
     GLfloat * getColorBottom();

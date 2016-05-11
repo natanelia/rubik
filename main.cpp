@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <vector>
 
 
 // Include GLEW
@@ -25,6 +26,9 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/texture.hpp>
+#include <common/controls.hpp>
+#include <common/objloader.hpp>
+#include <common/vboindexer.hpp>
 #include "cube.hpp"
 
 #define NO_ROTATE 0
@@ -99,7 +103,7 @@ static GLfloat vd[] = {
     -1.0f, 1.0f, 1.0f,
      1.0f, 1.0f, 1.0f,
 
-     1.0f,-1.0f,-1.0f, // Top
+     1.0f,-1.0f,-1.0f, // Front
      1.0f, 1.0f,-1.0f,
     -1.0f, 1.0f,-1.0f,
 
@@ -160,14 +164,64 @@ static GLfloat gd[] = {
     0.667979f, 1.0f-0.335851f
 };
 
+static GLfloat nd[] = {
+    1.0f, 0.0f, 0.0f, // Right
+    1.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
 
-// Projection matrix : 45deg Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-glm::mat4 ProjectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-// Camera matrix
-glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(8,8,12), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    1.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+
+   -1.0f, 0.0f, 0.0f, // Left
+   -1.0f, 0.0f, 0.0f,
+   -1.0f, 0.0f, 0.0f,
+
+   -1.0f, 0.0f, 0.0f,
+   -1.0f, 0.0f, 0.0f,
+   -1.0f, 0.0f, 0.0f,
+
+    0.0f, 1.0f, 0.0f, // Top
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+
+    0.0f,-1.0f, 0.0f, // Bottom
+    0.0f,-1.0f, 0.0f,
+    0.0f,-1.0f, 0.0f,
+
+    0.0f,-1.0f, 0.0f,
+    0.0f,-1.0f, 0.0f,
+    0.0f,-1.0f, 0.0f,
+
+    0.0f, 0.0f, 1.0f, // Back
+    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 1.0f,
+
+    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 1.0f,
+
+    0.0f, 0.0f,-1.0f, // Front
+    0.0f, 0.0f,-1.0f,
+    0.0f, 0.0f,-1.0f,
+
+    0.0f, 0.0f,-1.0f,
+    0.0f, 0.0f,-1.0f,
+    0.0f, 0.0f,-1.0f
+};
 
 int main( void )
 {
+
+    // Projection matrix : 45deg Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    glm::mat4 ProjectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+    // Camera matrix
+    glm::mat4 ViewMatrix = glm::lookAt(glm::vec3(8,8,12), glm::vec3(0,0,0), glm::vec3(0,1,0));
+
     // Initialise GLFW
     if( !glfwInit() )
     {
@@ -218,8 +272,8 @@ int main( void )
 
     // Create and compile our GLSL program from the shaders
     GLuint programID = LoadShaders( "TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader" );
-    
- 
+
+
 
 //    GLuint Texture = loadDDS("uvtemplate.DDS");
 
@@ -233,75 +287,75 @@ int main( void )
     cubesCode[0][0][0] = 111;
     cubesCode[0][0][1] = 112;
     cubesCode[0][0][2] = 113;
-    
+
     cubesCode[0][1][0] = 121;
     cubesCode[0][1][1] = 122;
     cubesCode[0][1][2] = 123;
-    
+
     cubesCode[0][2][0] = 131;
     cubesCode[0][2][1] = 132;
     cubesCode[0][2][2] = 133;
-    
+
     cubesCode[1][0][0] = 211;
     cubesCode[1][0][1] = 212;
     cubesCode[1][0][2] = 213;
-    
+
     cubesCode[1][1][0] = 221;
     // cubesCode[1][1][1] = 222;
     cubesCode[1][1][2] = 223;
-    
+
     cubesCode[1][2][0] = 231;
     cubesCode[1][2][1] = 232;
     cubesCode[1][2][2] = 233;
-    
+
     cubesCode[2][0][0] = 311;
     cubesCode[2][0][1] = 312;
     cubesCode[2][0][2] = 313;
-    
+
     cubesCode[2][1][0] = 321;
     cubesCode[2][1][1] = 322;
     cubesCode[2][1][2] = 323;
-    
+
     cubesCode[2][2][0] = 331;
     cubesCode[2][2][1] = 332;
     cubesCode[2][2][2] = 333;
-    
+
     Cube cubes[3][3][3];
-    cubes[0][0][0] = Cube("111", vd, gd);
-    cubes[0][0][1] = Cube("112", vd, gd);
-    cubes[0][0][2] = Cube("113", vd, gd);
+    cubes[0][0][0] = Cube("111", vd, gd, nd);
+    cubes[0][0][1] = Cube("112", vd, gd, nd);
+    cubes[0][0][2] = Cube("113", vd, gd, nd);
 
-    cubes[0][1][0] = Cube("121", vd, gd);
-    cubes[0][1][1] = Cube("122", vd, gd);
-    cubes[0][1][2] = Cube("123", vd, gd);
+    cubes[0][1][0] = Cube("121", vd, gd, nd);
+    cubes[0][1][1] = Cube("122", vd, gd, nd);
+    cubes[0][1][2] = Cube("123", vd, gd, nd);
 
-    cubes[0][2][0] = Cube("131", vd, gd);
-    cubes[0][2][1] = Cube("132", vd, gd);
-    cubes[0][2][2] = Cube("133", vd, gd);
+    cubes[0][2][0] = Cube("131", vd, gd, nd);
+    cubes[0][2][1] = Cube("132", vd, gd, nd);
+    cubes[0][2][2] = Cube("133", vd, gd, nd);
 
-    cubes[1][0][0] = Cube("211", vd, gd);
-    cubes[1][0][1] = Cube("212", vd, gd);
-    cubes[1][0][2] = Cube("213", vd, gd);
+    cubes[1][0][0] = Cube("211", vd, gd, nd);
+    cubes[1][0][1] = Cube("212", vd, gd, nd);
+    cubes[1][0][2] = Cube("213", vd, gd, nd);
 
-    cubes[1][1][0] = Cube("221", vd, gd);
-    // cubes[1][1][1] = Cube("222", vd, gd);
-    cubes[1][1][2] = Cube("223", vd, gd);
+    cubes[1][1][0] = Cube("221", vd, gd, nd);
+    // cubes[1][1][1] = Cube("222", vd, gd, nd);
+    cubes[1][1][2] = Cube("223", vd, gd, nd);
 
-    cubes[1][2][0] = Cube("231", vd, gd);
-    cubes[1][2][1] = Cube("232", vd, gd);
-    cubes[1][2][2] = Cube("233", vd, gd);
+    cubes[1][2][0] = Cube("231", vd, gd, nd);
+    cubes[1][2][1] = Cube("232", vd, gd, nd);
+    cubes[1][2][2] = Cube("233", vd, gd, nd);
 
-    cubes[2][0][0] = Cube("311", vd, gd);
-    cubes[2][0][1] = Cube("312", vd, gd);
-    cubes[2][0][2] = Cube("313", vd, gd);
+    cubes[2][0][0] = Cube("311", vd, gd, nd);
+    cubes[2][0][1] = Cube("312", vd, gd, nd);
+    cubes[2][0][2] = Cube("313", vd, gd, nd);
 
-    cubes[2][1][0] = Cube("321", vd, gd);
-    cubes[2][1][1] = Cube("322", vd, gd);
-    cubes[2][1][2] = Cube("323", vd, gd);
+    cubes[2][1][0] = Cube("321", vd, gd, nd);
+    cubes[2][1][1] = Cube("322", vd, gd, nd);
+    cubes[2][1][2] = Cube("323", vd, gd, nd);
 
-    cubes[2][2][0] = Cube("331", vd, gd);
-    cubes[2][2][1] = Cube("332", vd, gd);
-    cubes[2][2][2] = Cube("333", vd, gd);
+    cubes[2][2][0] = Cube("331", vd, gd, nd);
+    cubes[2][2][1] = Cube("332", vd, gd, nd);
+    cubes[2][2][2] = Cube("333", vd, gd, nd);
 
 
     int nbFrames = 0;
@@ -599,7 +653,7 @@ int main( void )
                     for(int i = 0; i < 1; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
@@ -613,7 +667,7 @@ int main( void )
                     for(int i = 0; i < 1; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -629,7 +683,7 @@ int main( void )
                     for(int i = 0; i < 1; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
@@ -643,7 +697,7 @@ int main( void )
                     for(int i = 0; i < 1; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -659,7 +713,7 @@ int main( void )
                     for(int i = 1; i < 2; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
@@ -673,7 +727,7 @@ int main( void )
                     for(int i = 1; i < 2; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -689,7 +743,7 @@ int main( void )
                     for(int i = 1; i < 2; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
@@ -703,7 +757,7 @@ int main( void )
                     for(int i = 1; i < 2; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -719,7 +773,7 @@ int main( void )
                     for(int i = 2; i < 3; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][2-k][j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][2-k][j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][2-k][j].getColorLeft());
@@ -733,7 +787,7 @@ int main( void )
                     for(int i = 2; i < 3; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -749,7 +803,7 @@ int main( void )
                     for(int i = 2; i < 3; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[i][k][2-j].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[i][k][2-j].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[i][k][2-j].getColorLeft());
@@ -763,7 +817,7 @@ int main( void )
                     for(int i = 2; i < 3; i++){
                         for(int j = 0; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -779,7 +833,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 0; j < 1; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
@@ -793,7 +847,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 0; j < 1; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -809,7 +863,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 0; j < 1; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
@@ -823,7 +877,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 0; j < 1; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -839,7 +893,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 1; j < 2; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
@@ -853,7 +907,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 1; j < 2; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -869,7 +923,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 1; j < 2; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
@@ -883,7 +937,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 1; j < 2; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -899,7 +953,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 2; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[2-k][j][i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[2-k][j][i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[2-k][j][i].getColorLeft());
@@ -913,7 +967,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 2; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -929,7 +983,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 2; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                temp_cube[i][j][k] = Cube("111",vd,gd);
+                                temp_cube[i][j][k] = Cube("111",vd, gd, nd);
                                 temp_cube[i][j][k].setColorBack(cubes[k][j][2-i].getColorBack());
                                 temp_cube[i][j][k].setColorFront(cubes[k][j][2-i].getColorFront());
                                 temp_cube[i][j][k].setColorLeft(cubes[k][j][2-i].getColorLeft());
@@ -943,7 +997,7 @@ int main( void )
                     for(int i = 0; i < 3; i++){
                         for(int j = 2; j < 3; j++){
                             for(int k = 0; k < 3; k++){
-                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd,gd);
+                                cubes[i][j][k] = Cube(std::to_string(i+1)+std::to_string(j+1)+std::to_string(k+1),vd, gd, nd);
                                 cubes[i][j][k].setColorBack(temp_cube[i][j][k].getColorBack());
                                 cubes[i][j][k].setColorFront(temp_cube[i][j][k].getColorFront());
                                 cubes[i][j][k].setColorLeft(temp_cube[i][j][k].getColorLeft());
@@ -989,5 +1043,4 @@ int main( void )
 
     return 0;
 }
-
 
